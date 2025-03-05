@@ -29,16 +29,19 @@ set timespent sec
 
 proc mine {} {
     global nonce
-    global difficulty
     global timespent
-    set zeros [string repeat "0" $difficulty]
+
     set data [string trim [.data get 1.0 end]]
-    set hash [calc_hash "$data$nonce"];
     set t0 [clock clicks -millisec]
-    while {![string match "$zeros*" $hash ]} {
-        incr nonce
-        set hash [calc_hash "$data$nonce"]; # 
+    
+    while 1 {
+        set hash [hash_data "$data$nonce"];
+        if [solution_found $hash] {
+            break
+        }
+        incr nonce        
     }
+    
     set timespent "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
     .hash state !readonly
     .hash delete 0 end
@@ -46,9 +49,15 @@ proc mine {} {
     .hash state readonly
 }
 
-proc calc_hash {s} {
-    set output [exec echo -n $s | sha256sum]
-    return [string trim [lindex [split $output -] 0]]; # 
+proc solution_found {hash} {
+    global difficulty;          
+    set zeros [string repeat "0" $difficulty]; 
+    return [string match "$zeros*" $hash]
+}
+
+proc hash_data {data} {
+    set output [exec echo -n $data | sha256sum]
+    return [string trim [lindex [split $output -] 0]];
 }
 
 foreach w [winfo children .] {grid configure $w -padx 5 -pady 5}
