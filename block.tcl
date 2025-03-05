@@ -13,7 +13,10 @@ grid [tk::text .data -width 100 -height 10] -column 1 -row 2 -sticky news
 grid [ttk::label .hash-label -text Hash:] -column 0 -row 3 -sticky news
 grid [ttk::entry .hash -textvariable hash] -column 1 -row 3 -sticky news
 .hash state readonly
-grid [ttk::button .button -text Mine -command mine] -column 0 -row 4 -sticky news
+grid [ttk::label .difficulty-label -text Difficulty:] -column 0 -row 4 -sticky news
+grid [ttk::spinbox .difficulty -textvariable difficulty -from 1 -to 4 -increment 1] -column 1 -row 4 -sticky news
+.difficulty state readonly
+grid [ttk::button .button -text Mine -command mine] -column 0 -row 5 -sticky news
 
 grid columnconfigure . 1 -weight 1
 grid rowconfigure . 2 -weight 1
@@ -24,9 +27,11 @@ set difficulty 2
 
 proc mine {} {
     global nonce
+    global difficulty
+    set zeros [string repeat "0" $difficulty]
     set data [string trim [.data get 1.0 end]]
-    set hash [calc_hash "$data$nonce"]; # 
-    while {![string match "00*" $hash ]} {
+    set hash [calc_hash "$data$nonce"];
+    while {![string match "$zeros*" $hash ]} {
         incr nonce
         set hash [calc_hash "$data$nonce"]; # 
     }
