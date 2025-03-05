@@ -17,6 +17,7 @@ grid [ttk::label .difficulty-label -text Difficulty:] -column 0 -row 4 -sticky n
 grid [ttk::spinbox .difficulty -textvariable difficulty -from 1 -to 4 -increment 1] -column 1 -row 4 -sticky news
 .difficulty state readonly
 grid [ttk::button .button -text Mine -command mine] -column 0 -row 5 -sticky news
+grid [ttk::label .time -textvariable timespent] -column 1 -row 5 -sticky news
 
 grid columnconfigure . 1 -weight 1
 grid rowconfigure . 2 -weight 1
@@ -24,17 +25,21 @@ grid rowconfigure . 2 -weight 1
 set nonce 1
 set block 1
 set difficulty 2
+set timespent sec
 
 proc mine {} {
     global nonce
     global difficulty
+    global timespent
     set zeros [string repeat "0" $difficulty]
     set data [string trim [.data get 1.0 end]]
     set hash [calc_hash "$data$nonce"];
+    set t0 [clock clicks -millisec]
     while {![string match "$zeros*" $hash ]} {
         incr nonce
         set hash [calc_hash "$data$nonce"]; # 
     }
+    set timespent "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
     .hash state !readonly
     .hash delete 0 end
     .hash insert 0 $hash
