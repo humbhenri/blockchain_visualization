@@ -9,8 +9,10 @@ grid [ttk::labelframe .block2 -text "Block 2"] -sticky news
 grid [ttk::labelframe .block3 -text "Block 3"] -sticky news
 grid rowconfigure . 0 -weight 1
 grid rowconfigure . 1 -weight 1
+grid rowconfigure . 2 -weight 1
 grid columnconfigure . 0 -weight 1
 grid columnconfigure . 1 -weight 1
+grid columnconfigure . 2 -weight 1
 
 foreach {block number} {
     block1 1
