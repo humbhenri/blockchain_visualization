@@ -28,8 +28,9 @@ foreach {block number} {
     grid [ttk::label .$block.difficulty-label -text Difficulty:] -column 0 -row 4 -sticky news
     grid [ttk::spinbox .$block.difficulty -textvariable difficulty$block -from 1 -to 4 -increment 1] -column 1 -row 4 -sticky news
     .$block.difficulty state readonly
+    grid [ttk::label .$block.time -text sec] -column 1 -row 5 -sticky news
     grid [ttk::button .$block.button -text Mine] -column 0 -row 5 -sticky news
-    grid [ttk::label .$block.time -textvariable timespent$block] -column 1 -row 5 -sticky news
+    
 
     grid columnconfigure .$block 1 -weight 1
     grid rowconfigure .$block 2 -weight 1
@@ -57,14 +58,17 @@ proc mine {block} {
     }
     
     set timespent "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
-    .$block.hash state !readonly
-    .$block.hash delete 0 end
-    .$block.hash insert 0 $hash
-    .$block.hash state readonly
-    .$block.nonce state !readonly
-    .$block.nonce delete 0 end
-    .$block.nonce insert 0 $nonce
-    .$block.nonce state readonly
+    .$block.time configure -text $timespent; # 
+    puts "timespent = $timespent"
+    replace_entry .$block.hash $hash
+    replace_entry .$block.nonce $nonce
+}
+
+proc replace_entry {entry text} {
+    $entry state !readonly
+    $entry delete 0 end
+    $entry insert 0 $text
+    $entry state readonly
 }
 
 proc solution_found {hash block} {
