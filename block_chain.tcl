@@ -6,6 +6,7 @@ wm title . "Blockchain demo"
 
 grid [ttk::labelframe .block1 -text "Block 1"] -sticky news
 grid [ttk::labelframe .block2 -text "Block 2"] -sticky news
+grid [ttk::labelframe .block3 -text "Block 3"] -sticky news
 grid rowconfigure . 0 -weight 1
 grid rowconfigure . 1 -weight 1
 grid columnconfigure . 0 -weight 1
@@ -14,6 +15,7 @@ grid columnconfigure . 1 -weight 1
 foreach {block number} {
     block1 1
     block2 2
+    block3 3
 } {
     grid [ttk::label .$block.block-label -text Block:] -column 0 -row 0 -sticky news
     grid [ttk::entry .$block.block -textvariable block$block] -column 1 -row 0 -sticky news
@@ -42,6 +44,7 @@ foreach {block number} {
 
 .block1.button configure -command {mine block1}
 .block2.button configure -command {mine block2}
+.block3.button configure -command {mine block3}
 
 proc mine {block} {
     set data [string trim [.$block.data get 1.0 end]]
