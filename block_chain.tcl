@@ -1,6 +1,7 @@
 #!/usr/bin/wish
 
 package require Tk
+package require sha256
 
 wm title . "Blockchain demo"
 
@@ -85,7 +86,7 @@ proc solution_found {hash block} {
 }
 
 proc hash_data {data} {
-    set output [exec echo -n $data | sha256sum]
+    set output [sha2::sha256 $data]
     return [string trim [lindex [split $output -] 0]];
 }
 
