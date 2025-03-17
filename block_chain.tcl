@@ -5,9 +5,17 @@ package require sha256
 
 wm title . "Blockchain demo"
 
-grid [ttk::labelframe .block1 -text "Block 1"] -sticky news
-grid [ttk::labelframe .block2 -text "Block 2"] -sticky news
-grid [ttk::labelframe .block3 -text "Block 3"] -sticky news
+ttk::style configure My.TLabelframe_block1.TLabelframe -background lightblue
+ttk::style configure My.TLabelframe_block1.TLabelframe.Label -background lightblue
+ttk::style configure My.TLabelframe_block2.TLabelframe -background lightblue
+ttk::style configure My.TLabelframe_block2.TLabelframe.Label -background lightblue
+ttk::style configure My.TLabelframe_block3.TLabelframe -background lightblue
+ttk::style configure My.TLabelframe_block3.TLabelframe.Label -background lightblue
+
+
+grid [ttk::labelframe .block1 -text "Block 1" -style My.TLabelframe_block1.TLabelframe] -sticky news
+grid [ttk::labelframe .block2 -text "Block 2" -style My.TLabelframe_block2.TLabelframe] -sticky news
+grid [ttk::labelframe .block3 -text "Block 3" -style My.TLabelframe_block3.TLabelframe] -sticky news
 grid rowconfigure . 0 -weight 1
 grid rowconfigure . 1 -weight 1
 grid rowconfigure . 2 -weight 1
@@ -43,19 +51,33 @@ foreach {block number} {
     set block$block $number
     set nonce$block 1
     set difficulty$block 1
+
+    .$block.button configure -command "mine $block"
+
+    bind .$block.data <<Modified>> "data_changed $block"
 }
 
-.block1.button configure -command {mine block1}
-.block2.button configure -command {mine block2}
-.block3.button configure -command {mine block3}
+proc data_changed {block} {
+    set data [string trim [.$block.data get 1.0 end]]
+    set hash [hash_data $data]
+    replace_entry .$block.hash $hash
+    .$block.data edit modified 0
+    change_color $block red
+}
+
+proc change_color {block color} {
+    ttk::style configure My.TLabelframe_$block.TLabelframe -background $color
+    ttk::style configure My.TLabelframe_$block.TLabelframe.Label -background $color
+}
+
 
 proc mine {block} {
     set data [string trim [.$block.data get 1.0 end]]
     set t0 [clock clicks -millisec]
-    set nonce [.$block.nonce get]; # 
+    set nonce [.$block.nonce get]
     
     while 1 {
-        set hash [hash_data $data$nonce];
+        set hash [hash_data $data$nonce]
         puts "nonce = $nonce, hash = $hash"
         if [solution_found $hash $block] {
             break
@@ -68,6 +90,7 @@ proc mine {block} {
     puts "timespent = $timespent"
     replace_entry .$block.hash $hash
     replace_entry .$block.nonce $nonce
+    change_color $block lightgreen
 }
 
 proc replace_entry {entry text} {
