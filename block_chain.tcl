@@ -7,8 +7,11 @@ wm title . "Blockchain demo"
 
 set max_blocks 3
 
+# draw a block chain of max_blocks blocks
 for {set i 1} {$i <= $max_blocks} {incr i} {
     set block block$i
+
+    # configure themes
     ttk::style configure My.TLabelframe_$block.TLabelframe -background lightblue
     ttk::style configure My.TLabelframe_$block.TLabelframe.Label -background lightblue
 
@@ -28,7 +31,7 @@ for {set i 1} {$i <= $max_blocks} {incr i} {
     .$block.difficulty state readonly
     grid [ttk::label .$block.time -text sec] -column 1 -row 5 -sticky news
     grid [ttk::button .$block.button -text Mine] -column 0 -row 5 -sticky news
-    
+
 
     grid columnconfigure .$block 1 -weight 1
     grid rowconfigure .$block 2 -weight 1
@@ -42,6 +45,7 @@ for {set i 1} {$i <= $max_blocks} {incr i} {
     bind .$block.data <<Modified>> "data_changed $block"
 }
 
+# when data changes we must calculante another hash, make the background red to suggest that
 proc data_changed {block} {
     set data [string trim [.$block.data get 1.0 end]]
     set hash [hash_data $data]
@@ -50,7 +54,7 @@ proc data_changed {block} {
     global max_blocks
     for {set i [extract_block_number $block]} {$i <= $max_blocks} {incr i} {
         change_color block$i red
-    }    
+    }
 }
 
 proc extract_block_number {block} {
@@ -74,30 +78,36 @@ proc prev_block_hash {block} {
     return [string trim [.$prev_block.hash get]]
 }
 
+# when the user click in the mine button, we must
+# find a nonce so that the hash of the nonce and the
+# data begins with the number of zeroes according to
+# the difficulty
 proc mine {block} {
     set data [string trim [.$block.data get 1.0 end]]
     set t0 [clock clicks -millisec]
     set nonce [.$block.nonce get]
     set prev [prev_block_hash $block]
     puts "prev hash = $prev"
-    
+
     while 1 {
         set hash [hash_data $data$nonce$prev]
         puts "nonce = $nonce, hash = $hash"
         if [solution_found $hash $block] {
             break
         }
-        incr nonce        
+        incr nonce
     }
-    
+
     set timespent "[expr {([clock clicks -millisec]-$t0)/1000.}] sec"
-    .$block.time configure -text $timespent; # 
+    .$block.time configure -text $timespent; #
     puts "timespent = $timespent"
     replace_entry .$block.hash $hash
     replace_entry .$block.nonce $nonce
     change_color $block lightgreen
 }
 
+# given an entry widget replace the
+# text in it with the given text argument
 proc replace_entry {entry text} {
     $entry state !readonly
     $entry delete 0 end
@@ -105,11 +115,13 @@ proc replace_entry {entry text} {
     $entry state readonly
 }
 
+# return true if hash begins with
+# the number of zeroes according to the block's difficulty
 proc solution_found {hash block} {
     set difficulty [.$block.difficulty get]
     puts "difficulty = $difficulty"
     puts "block = $block"
-    set zeros [string repeat "0" $difficulty]; 
+    set zeros [string repeat "0" $difficulty];
     return [string match "$zeros*" $hash]
 }
 
