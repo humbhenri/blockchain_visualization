@@ -1,7 +1,7 @@
 # blockchain_visualization
 Blockchain visualization (hash, blocks, etc).
 
-Inspired in [Anders' blockchain demo](https://andersbrownworth.com/blockchain/)
+Inspired in [Anders' blockchain demo](https://andersbrownworth.com/blockchain/).
 
 ## Hash
 ![Hash](./imgs/hash.png)
@@ -9,3 +9,13 @@ Inspired in [Anders' blockchain demo](https://andersbrownworth.com/blockchain/)
 ## Block and mine
 
 ![Block](./imgs/block.png)
+
+## Blockchain
+
+![Blockchain](./imgs/blockchain.gif)
+
+## Run
+
+```
+tclsh <file>.tcl
+```
